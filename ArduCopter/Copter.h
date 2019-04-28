@@ -24,6 +24,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <stdarg.h>
+#include "utility.h"
 
 #include <AP_HAL/AP_HAL.h>
 
@@ -83,6 +84,9 @@
 #include <AP_Arming/AP_Arming.h>
 #include <AP_SmartRTL/AP_SmartRTL.h>
 #include <AP_TempCalibration/AP_TempCalibration.h>
+#include <AP_Notify/Buzzer.h>
+#include "pid.h"
+#include <string.h>
 
 // Configuration
 #include "defines.h"
@@ -954,6 +958,7 @@ private:
 #endif
 #endif
     ModeAltHold mode_althold;
+    ModeRYA mode_rya;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
 #endif
