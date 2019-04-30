@@ -13,8 +13,16 @@ bool Copter::ModeRYA::init(bool ignore_checks)
         pos_control->set_alt_target_to_current_alt();
         pos_control->set_desired_velocity_z(inertial_nav.get_velocity_z());
     }
-
+    new_request = false;
+    pid_roll = 0;
+    pid_pitch = 0;
     return true;
+}
+
+bool Copter::ModeRYA::control(float pid_roll, float pid_pitch) {
+    this->pid_roll = pid_roll;
+    this->pid_pitch = pid_pitch;
+    this->new_request = true;
 }
 
 // althold_run - runs the althold controller
@@ -43,6 +51,16 @@ void Copter::ModeRYA::run()
     float target_climb_rate = get_pilot_desired_climb_rate(channel_throttle->get_control_in());
     target_climb_rate = constrain_float(target_climb_rate, -get_pilot_speed_dn(), g.pilot_speed_up);
 
+    if ((target_roll==0) && (target_pitch==0)){
+        target_roll = -this->pid_roll; 
+        target_pitch = -this->pid_pitch;
+        // hal.console->printf("camera target_roll: %.2f, target_pitch: %.2f\n",target_roll, target_pitch);
+    } else {
+        this->pid_roll = 0;
+        this->pid_pitch = 0;
+        // new_request = false;
+        // hal.console->printf("radio control: target_roll: %.2f, target_pitch: %.2f\n",target_roll, target_pitch);
+    }
     
     // Alt Hold State Machine Determination
     if (!motors->armed() || !motors->get_interlock()) {

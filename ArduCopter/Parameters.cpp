@@ -444,6 +444,29 @@ const AP_Param::Info Copter::var_info[] = {
     // @User: Advanced
     GSCALAR(poshold_brake_angle_max, "PHLD_BRAKE_ANGLE",  POSHOLD_BRAKE_ANGLE_DEFAULT),
 
+
+    // @Param: RYA_PID_KP
+    // @DisplayName: Kp for RYA mode
+    // @Description: Nothing to say.
+    // @Values: 0 -> 2
+    // @User: Advanced
+    GSCALAR(rya_pid_kp, "RYA_PID_KP",    RYA_PID_KP_DEFAULT),
+
+    // @Param: RYA_PID_KI
+    // @DisplayName: Ki for RYA mode
+    // @Description: Nothing to say.
+    // @Values: 0 -> 2
+    // @User: Advanced
+    GSCALAR(rya_pid_ki, "RYA_PID_KI",    RYA_PID_KI_DEFAULT),
+
+    // @Param: RYA_PID_KD
+    // @DisplayName: Kd for RYA mode
+    // @Description: Nothing to say.
+    // @Values: 0 -> 2
+    // @User: Advanced
+    GSCALAR(rya_pid_kd, "RYA_PID_KD",    RYA_PID_KD_DEFAULT),
+
+
     // @Param: LAND_REPOSITION
     // @DisplayName: Land repositioning
     // @Description: Enables user input during LAND mode, the landing phase of RTL, and auto mode landings.

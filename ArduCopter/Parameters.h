@@ -361,10 +361,17 @@ public:
         k_param_DataFlash = 253, // 253 - Logging Group
 
         // 254,255: reserved
+        k_param_rya_pid_kp,
+        k_param_rya_pid_ki,
+        k_param_rya_pid_kd,
 
         // the k_param_* space is 9-bits in size
         // 511: reserved
     };
+
+    AP_Float                rya_pid_kp;
+    AP_Float                rya_pid_ki;
+    AP_Float                rya_pid_kd;
 
     AP_Int16        format_version;
 

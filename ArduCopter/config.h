@@ -732,3 +732,15 @@
 #ifndef OSD_ENABLED
  #define OSD_ENABLED DISABLED
 #endif
+
+#ifndef RYA_PID_KP_DEFAULT
+# define RYA_PID_KP_DEFAULT      6.0     // default value for my new parameter
+#endif
+
+#ifndef RYA_PID_KI_DEFAULT
+# define RYA_PID_KI_DEFAULT      0.0     // default value for my new parameter
+#endif
+
+#ifndef RYA_PID_KD_DEFAULT
+# define RYA_PID_KD_DEFAULT      9.0     // default value for my new parameter
+#endif

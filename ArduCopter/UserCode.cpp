@@ -4,6 +4,7 @@
 // using namespace std;
 
 #define LOG(x,...)  hal.console->printf(x, __VA_ARGS__)
+#define FOCAL   720.5f
 
 #ifdef USERHOOK_INIT
 void Copter::userhook_init()
@@ -16,8 +17,8 @@ void Copter::userhook_init()
     error_x_cm = 0;
     error_x_cm = 0;
 
-    pid_posx.pid_set_k_params(6.0f, 0.0f, 9.0f, 0.04, 1000);
-    pid_posy.pid_set_k_params(6.0f, 0.0f, 9.0f, 0.04, 1000);
+    pid_posx.pid_set_k_params((float)g.rya_pid_kp, (float)g.rya_pid_ki, (float)g.rya_pid_kd, 0.01, 250);
+    pid_posy.pid_set_k_params((float)g.rya_pid_kp, (float)g.rya_pid_ki, (float)g.rya_pid_kd, 0.01, 250);
     object = 1;
     rya_rangefinder = 0;
     // put your initialisation code here
@@ -38,6 +39,7 @@ void Copter::userhook_FastLoop()
     int data_len = 0;
     char data[BUFFER_FRAME_SIZE];
     FILE *stream;
+    int detected = 0;
     while (ips_bytes > 0)
     {
         ips_bytes--;
@@ -56,22 +58,36 @@ void Copter::userhook_FastLoop()
             // fclose(stream);
             stringstream os;
             os << data;
-            os >> error_x >> error_y;
+            os >> detected >> error_x >> error_y;
             LOG("\nReceive from server: error_x = %d, error_y = %d\n", error_x, error_y);
-            if (object == 1)
+            if (detected == 1)
             {
                 //rya_buzzer.on(true);
                 // error_x_cm = error_x/720.5f*rya_rangefinder - rya_rangefinder*tanf(ahrs.roll);
                 // error_y_cm = error_y/720.5f*rya_rangefinder - rya_rangefinder*tanf(-ahrs.pitch);
                 //hal.console->printf("rangefinder: %d, tan(roll): %.2f, error_x: %d, error_x_cm: %.2f\n", rya_rangefinder, tanf(ahrs.roll), error_x, error_x_cm);
                 // rya_time = Utility::millis();
-                error_x_cm = (float)error_x - tanf(ahrs.roll) * 360.25;
-                error_y_cm = -(float)error_y - tanf(ahrs.pitch) * 360.25;
+                float delta_alpha_x = atan(error_x / FOCAL) + ahrs.roll;
+                float delta_alpha_y = atan(error_y / FOCAL) + ahrs.pitch;
+                // if (delta_alpha_x > 0 ) {
+                    error_x_cm = tanf(delta_alpha_x) * FOCAL;
+                // } else {
+                    // error_x_cm = tanf(-delta_alpha_x) * FOCAL;
+                // }
+                // if (delta_alpha_y > 0 ) {
+                    error_y_cm = tanf(delta_alpha_y) * FOCAL;
+                // } else {
+                    // error_y_cm = tanf(-delta_alpha_y) * FOCAL;
+                // }
+                // error_x_cm = (float)error_x + tanf(ahrs.roll) * 720.5;
+                // error_y_cm = (float)error_y + tanf(ahrs.pitch) * 720.5;
                 pid_roll = pid_posx.pid_process(error_x_cm, Utility::millis()); //Uc: control angle [degree]
                 pid_pitch = pid_posy.pid_process(error_y_cm, Utility::millis());
-                pid_pitch *= 0.75;
-                pid_roll *= 0.75;
-                LOG("object: %d, error_x: %d, error_y: %d, (x,y): (%.2f, %.2f)\n", object, error_x, error_y, error_x_cm, error_y_cm);
+                // pid_pitch *= 0.5;
+                // pid_roll *= 0.5;
+                // mode_rya.new_request = true;
+                mode_rya.control(pid_roll, pid_pitch);
+                LOG("detected: %d, error_x: %d, error_y: %d, (x,y): (%.2f, %.2f), (roll,pitch): (%.2f,%.2f)\n", object, error_x, error_y, error_x_cm, error_y_cm, ahrs.roll, ahrs.pitch);
                 // LOG("error_x: %d, error_y: %d, (x,y): (%.2f, %.2f), (roll,pitch): (%.2f,%.2f): %s\n", object, error_x, error_y, error_x_cm, error_y_cm, pid_roll, pid_pitch, data);
                 // LOG("hello %d", 1);
             }
@@ -102,6 +118,10 @@ void Copter::userhook_50Hz()
 #ifdef USERHOOK_MEDIUMLOOP
 void Copter::userhook_MediumLoop()
 {
+    // LOG("g.rya_pid_kp: %.2f %.2f\n", (float)g.rya_pid_kp, (float)g.rya_pid_kd);
+    pid_posx.pid_set_k_params((float)g.rya_pid_kp, (float)g.rya_pid_ki, (float)g.rya_pid_kd, 0.01, 250);
+    pid_posy.pid_set_k_params((float)g.rya_pid_kp, (float)g.rya_pid_ki, (float)g.rya_pid_kd, 0.01, 250);
+    // LOG("g.rya_pid_kp: %.2f %.2f\n", g.rya_pid_kp, g.rya_pid_kd);
     hal.uartF->printf("hello\n");
     // put your 10Hz code here
 }

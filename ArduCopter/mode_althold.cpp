@@ -42,6 +42,14 @@ void Copter::ModeAltHold::run()
     float target_climb_rate = get_pilot_desired_climb_rate(channel_throttle->get_control_in());
     target_climb_rate = constrain_float(target_climb_rate, -get_pilot_speed_dn(), g.pilot_speed_up);
 
+
+    // if ((target_roll==0) && (target_pitch==0) && (object==1)){
+    //     target_roll = pid_roll; 
+    //     target_pitch = pid_pitch;
+    //     //hal.uartF->printf("target_roll: %.2f, target_pitch: %.2f\n",target_roll, target_pitch);
+    // } else {
+    //     //hal.uartF->printf("target_roll: %.2f, target_pitch: %.2f\n",target_roll, target_pitch);
+    // }
     // Alt Hold State Machine Determination
     if (!motors->armed() || !motors->get_interlock()) {
         althold_state = AltHold_MotorStopped;

@@ -262,6 +262,7 @@ class ModeRYA : public Mode {
 public:
     // inherit constructor
     using Copter::Mode::Mode;
+    bool new_request;
 
     bool init(bool ignore_checks) override;
     void run() override;
@@ -273,6 +274,7 @@ public:
     bool has_user_takeoff(bool must_navigate) const override {
         return !must_navigate;
     }
+    bool control(float pid_roll, float pid_pitch);
 
 protected:
 
@@ -280,7 +282,8 @@ protected:
     const char *name4() const override { return "RYAM"; }
 
 private:
-
+    float pid_roll;
+    float pid_pitch;
 };
 
 class ModeAuto : public Mode {
